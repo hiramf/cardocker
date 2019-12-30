@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  node:
+    build: 
+      context: ./node
+      args:
+        - RELEASE=v0.8.5-alpha1
+    environment:
+        - CONFIG=https://hydra.iohk.io/build/1523436/download/1/nightly-config.yaml
+        - HASH=9409af111b04896c756c1cee3b7f9bae8b9ed1843c9e0a5f07d92ab9b62f6f78
+        - PUBLIC_IP
+    ports:
+      - 8299:8299
