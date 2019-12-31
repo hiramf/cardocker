@@ -12,3 +12,7 @@ services:
         - PUBLIC_IP
     ports:
       - 8299:8299
+      - 3000:3000
+      - 8488:8488
+    volumes:
+      - ./storage:/mnt/storage
