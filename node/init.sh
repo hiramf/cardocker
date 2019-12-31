@@ -1,8 +1,7 @@
-#!bin/bash
+#!/bin/bash
 
 set -e
 
-wget ${CONFIG}
-wget ${GENESIS}
+python3 $ENV_PREFIX/bin/make_config.py
 
 exec "$@"
