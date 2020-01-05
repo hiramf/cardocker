@@ -9,10 +9,13 @@ services:
     environment:
         - CONFIG=https://hydra.iohk.io/build/1523436/download/1/nightly-config.yaml
         - HASH=9409af111b04896c756c1cee3b7f9bae8b9ed1843c9e0a5f07d92ab9b62f6f78
-        - PUBLIC_IP
+        - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
+        - REST_PORT=${REST_PORT}
+        - LISTEN_PORT=${LISTEN_PORT}
+        - STORAGE_DIR=${STORAGE_DIR}
     ports:
       - 8299:8299
       - 3000:3000
       - 8488:8488
     volumes:
-      - ./storage:/mnt/storage
+      - ${LOCAL_STORAGE}:${STORAGE_DIR}
