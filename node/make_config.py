@@ -30,7 +30,7 @@ def tcpping(host, port):
         # Stop Timer
         s_stop = timer()
         s_runtime = "%.2f" % (1000 * (s_stop - s_start))
-        logger.info(f"Connected to trusted peer {host}[{port}] in {s_runtime} ms")
+        logger.info(f"Connected to trusted peer {host}:{port} in {s_runtime} ms")
         return s_runtime
 
 ENV_PREFIX = os.environ.get('ENV_PREFIX')
