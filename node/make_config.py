@@ -51,6 +51,7 @@ config['p2p']['listen_address'] = f"/ip4/0.0.0.0/tcp/{LISTEN_PORT}"
 config['p2p']['public_address'] = f"/ip4/{PUBLIC_IP}/tcp/{LISTEN_PORT}"
 config['p2p']['public_id'] = PUBLIC_ID
 config['storage'] = STORAGE_DIR
+config['rest']['listen'] = f"127.0.0.1:{REST_PORT}"
 
 # Optional
 config['p2p']['topics_of_interest']['blocks'] = "high"
