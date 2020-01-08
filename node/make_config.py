@@ -53,8 +53,8 @@ if os.path.isfile(f'{STORAGE_DIR}/config.yaml'):
         config = yaml.load(file, Loader=yaml.SafeLoader)
 else:
     logger.info('Retrieving config from Jormungandr status page')
-with request.urlopen(CONFIG_URL) as response:
-    config = yaml.load(response.read(), Loader=yaml.SafeLoader)
+    with request.urlopen(CONFIG_URL) as response:
+        config = yaml.load(response.read(), Loader=yaml.SafeLoader)
 
 with request.urlopen('https://api.ipify.org') as response:
     PUBLIC_IP = response.read().decode('utf-8')
@@ -88,7 +88,7 @@ logging.info(f"Checking {n_peers} trusted peers...")
 for idx, peer in enumerate(config['p2p']['trusted_peers']):
     _, _, host, _, port = peer['address'].split('/')
     try:
-    t = tcpping(host, port)
+        t = tcpping(host, port)
     except (ValueError, ConnectionRefusedError, ConnectionError) as e:
         logger.warning(f"FAIL: Bad peer {idx}: {peer['id']}")
         if len(config['p2p']['trusted_peers']) > 1:
@@ -96,8 +96,9 @@ for idx, peer in enumerate(config['p2p']['trusted_peers']):
         else:
             logger.warning('Could not remove peer because it was the last one.')
             continue
-    # Can set peers dynamically with t in future
+        # Can set peers dynamically with t in future
 logger.info(f"Using {len(config['p2p']['trusted_peers'])}/{n_peers} trusted peers")
 
-with open(f"{ENV_PREFIX}/bin/config.yaml", 'w') as file:
+with open(f"{STORAGE_DIR}/config.yaml", 'w') as file:
     documents = yaml.dump(config, file)
+
