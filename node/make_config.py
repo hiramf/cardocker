@@ -11,7 +11,7 @@ import yaml
 
 logging.basicConfig(level=logging.DEBUG,
                     # Use Jormungandr logging format
-                    format='%(asctime)s.%(msecs)03d %(levelname)s %(message)s',
+                    format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
                     datefmt='%b %d %H:%M:%S',
                     )
 logger = logging.getLogger(__file__)
