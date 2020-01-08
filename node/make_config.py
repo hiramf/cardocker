@@ -16,21 +16,28 @@ logging.basicConfig(level=logging.DEBUG,
                     )
 logger = logging.getLogger(__file__)
 
-def tcpping(host, port):
+def tcpping(host, port, timeout=4):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(1)
+    s.settimeout(timeout)
     s_start = timer()
     try:
         s.connect((host, int(port)))
         s.shutdown(socket.SHUT_RD)
     # Connection Timed Out
-    except (socket.timeout, OSError):
+    except socket.timeout as e:
+        logger.error(f"Peer timed out: {host}[{port}]")
+        raise ConnectionError from e
+    except ConnectionRefusedError as e:
+        logger.error(f"Peer refused connection: {host}[{port}]")
+        raise
+    except OSError as e:
         logging.error(f"Could not connect to {host}[{port}]")
+        raise
     else:
         # Stop Timer
         s_stop = timer()
         s_runtime = "%.2f" % (1000 * (s_stop - s_start))
-        logger.info(f"Connected to trusted peer {host}:{port} in {s_runtime} ms")
+        logger.info(f"SUCESS: Connected to trusted peer {host}:{port} in {s_runtime} ms")
         return s_runtime
 
 ENV_PREFIX = os.environ.get('ENV_PREFIX')
@@ -66,10 +73,21 @@ config['mempool']['log_ttl'] = '24h'
 config['mempool']['garbage_collection_interval'] = '2h'
 
 # Check peers
+n_peers = len(config['p2p']['trusted_peers'])
+logging.info(f"Checking {n_peers} trusted peers...")
 for idx, peer in enumerate(config['p2p']['trusted_peers']):
     _, _, host, _, port = peer['address'].split('/')
+    try:
     t = tcpping(host, port)
+    except (ValueError, ConnectionRefusedError, ConnectionError) as e:
+        logger.warning(f"FAIL: Bad peer {idx}: {peer['id']}")
+        if len(config['p2p']['trusted_peers']) > 1:
+            config['p2p']['trusted_peers'].remove(peer)
+        else:
+            logger.warning('Could not remove peer because it was the last one.')
+            continue
     # Can set peers dynamically with t in future
+logger.info(f"Using {len(config['p2p']['trusted_peers'])}/{n_peers} trusted peers")
 
 with open(f"{ENV_PREFIX}/bin/config.yaml", 'w') as file:
     documents = yaml.dump(config, file)
