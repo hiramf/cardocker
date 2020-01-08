@@ -45,7 +45,7 @@ CONFIG_URL = os.environ.get('CONFIG')
 LISTEN_PORT = os.environ.get('LISTEN_PORT', default=3000)
 REST_PORT = os.environ.get('REST_PORT', default=3100)
 STORAGE_DIR = os.environ.get('STORAGE_DIR', default="/mnt/storage")
-PUBLIC_ID = secrets.token_hex(24)
+PUBLIC_ID = os.environ.get('PUBLIC_ID', default=secrets.token_hex(24))
 
 with request.urlopen(CONFIG_URL) as response:
     config = yaml.load(response.read(), Loader=yaml.SafeLoader)
@@ -56,11 +56,10 @@ with request.urlopen('https://api.ipify.org') as response:
 # Required
 config['p2p']['listen_address'] = f"/ip4/0.0.0.0/tcp/{LISTEN_PORT}"
 config['p2p']['public_address'] = f"/ip4/{PUBLIC_IP}/tcp/{LISTEN_PORT}"
-config['p2p']['public_id'] = PUBLIC_ID
 config['storage'] = STORAGE_DIR
 config['rest']['listen'] = f"127.0.0.1:{REST_PORT}"
 
-# Optional
+# High/High for stake pools
 config['p2p']['topics_of_interest']['blocks'] = "high"
 config['p2p']['topics_of_interest']['messages'] = "high"
 
@@ -71,6 +70,11 @@ config['mempool'] = {}
 config['mempool']['fragment_ttl'] = '2h'
 config['mempool']['log_ttl'] = '24h'
 config['mempool']['garbage_collection_interval'] = '2h'
+
+# Optional
+#config['log'][0]['output'] = 'journald'
+config['p2p']['public_id'] = PUBLIC_ID
+config['no_blockchain_updates_warning_interval'] = '360s'
 
 # Check peers
 n_peers = len(config['p2p']['trusted_peers'])
