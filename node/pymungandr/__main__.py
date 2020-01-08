@@ -1,6 +1,13 @@
 from .rest import Api
 from . import settings
 
+import time
 
-jrest = Api(settings.CONFIG)
-print(jrest.stats())
+j = Api(settings.CONFIG)
+
+
+stats = j.stats
+del stats['version']
+
+for k,v in stats.items():
+    print(f'{k}: {v}')

@@ -11,9 +11,9 @@ logger = logging.getLogger(__file__)
 
 def load_config():
     try:
-        ENV_PREFIX = os.environ.get('ENV_PREFIX')       
+        STORAGE_DIR = os.environ.get('STORAGE_DIR')       
         # Load Configuration
-        with open(os.path.join(ENV_PREFIX, 'bin/config.yaml')) as file:
+        with open(os.path.join(STORAGE_DIR, 'config.yaml')) as file:
             return yaml.load(file, Loader=yaml.SafeLoader)
     except Exception as e:
         logger.exception(e)

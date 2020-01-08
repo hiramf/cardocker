@@ -1,7 +1,11 @@
-import urllib.request
-import yaml
-import os
 import logging
+import os
+import socket
+import sys
+import urllib.request
+from timeit import default_timer as timer
+
+import yaml
 
 logging.basicConfig(level=logging.DEBUG,
                     # Use Jormungandr logging format
@@ -15,21 +19,68 @@ class Api:
     def __init__(self, config):
         self.config = config
     
-    def request(self, x:str):
+    @staticmethod
+    def yaml(x:str):
         return yaml.load(
-            urllib.request.urlopen(
-                    f"{self.listen}/api/v0/{x}"
-                ).read(), 
+            x,
             Loader=yaml.SafeLoader
         )
 
-    @property
-    def listen(self):
-        return f"http://{self.config['rest']['listen']}"
+    @staticmethod
+    def check_peer(host, port=3000, timeout=4):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(timeout)
+        s_start = timer()
+        try:
+            s.connect((host, int(port)))
+            s.shutdown(socket.SHUT_RD)
+        # Connection Timed Out
+        except socket.timeout as e:
+            logger.error(f"FAIL: Peer timed out: {host}[{port}]")
+            raise ConnectionError from e
+        except ConnectionRefusedError as e:
+            logger.error(f"FAIL: Peer refused connection: {host}[{port}]")
+            raise
+        except OSError as e:
+            logging.error(f"FAIL: Could not connect to {host}[{port}]")
+            raise
+        else:
+            # Stop Timer
+            s_stop = timer()
+            s_runtime = "%.2f" % (1000 * (s_stop - s_start))
+            logger.info(f"SUCESS: Connected to trusted peer {host}:{port} in {s_runtime} ms")
+            return s_runtime
+    
+    def request(self, x:str):
+        return self.yaml(
+            urllib.request.urlopen(
+                    f"http://{self.config['rest']['listen']}/api/v0/{x}"
+                ).read()
+        )
 
+    @property
     def stats(self):
         return self.request("node/stats")
     
-    def account_settings(self, account_address):
-        return self.request(f"settings?account-id={account_address}")
+    @property
+    def tip(self):
+        return self.request("tip")
     
+    @property
+    def settings(self):
+        return self.request("settings")
+    
+    @property
+    def diagnostic(self):
+        return self.request("diagnostic")
+
+    @property
+    def stake(self):
+        return self.request("stake")
+    
+    @property
+    def stake_pools(self):
+        return self.request("stake_pools")
+    
+    def stake_pool(self, stake_pool_hash):
+        return self.request(f"stake_pool/{stake_pool_hash}")
