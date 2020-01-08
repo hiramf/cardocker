@@ -5,7 +5,7 @@
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
 	"dockerComposeFile": [
-		"../docker-compose.yml",
+		"../docker-compose_itn.yml",
 		"docker-compose.yml"
 	],
 
@@ -37,7 +37,7 @@
 	// "shutdownAction": "none",
 
 	// Uncomment the next line to run commands after the container is created - for example installing git.
-	// "postCreateCommand": "apt-get update && apt-get install -y git",
+	"postCreateCommand": "pip3 install -r requirements.txt",
 
 	// Add the IDs of extensions you want installed when the container is created in the array below.
 	"extensions": [

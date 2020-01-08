@@ -12,6 +12,14 @@
             "module": "pymungandr",
             "console": "internalConsole",
             "cwd": "${workspaceRoot}/node",
+        },
+        {
+            "name": "make_config",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/node/make_config.py",
+            "console": "internalConsole",
+            "cwd": "${workspaceRoot}/node",
         }
     ]
 }
