@@ -50,6 +50,7 @@ COPY --from=build /app/src/scripts ./scripts
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+    systemd \
     python3-pip \
     python3-setuptools \
     && pip3 install wheel \
@@ -68,6 +69,6 @@ RUN chmod +x init.sh \
 EXPOSE 8299
 
 ENTRYPOINT ["/tini", "-g", "--", "init.sh"]
-CMD jormungandr --genesis-block-hash $HASH --config config.yaml
+CMD jormungandr --genesis-block-hash $HASH --config ${STORAGE_DIR}/config.yaml
 
 #CMD ["jormungandr", "--genesis-block", "block-0.bin", "--config", "config.yaml", "--secret", "pool-secret1.yaml"]
