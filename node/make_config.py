@@ -47,6 +47,12 @@ REST_PORT = os.environ.get('REST_PORT', default=3100)
 STORAGE_DIR = os.environ.get('STORAGE_DIR', default="/mnt/storage")
 PUBLIC_ID = os.environ.get('PUBLIC_ID', default=secrets.token_hex(24))
 
+if os.path.isfile(f'{STORAGE_DIR}/config.yaml'):
+    logger.info('Using stored config')
+    with open(f'{STORAGE_DIR}/config.yaml', 'r+') as file:
+        config = yaml.load(file, Loader=yaml.SafeLoader)
+else:
+    logger.info('Retrieving config from Jormungandr status page')
 with request.urlopen(CONFIG_URL) as response:
     config = yaml.load(response.read(), Loader=yaml.SafeLoader)
 
