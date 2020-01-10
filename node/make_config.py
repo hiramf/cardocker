@@ -19,8 +19,8 @@ logger = logging.getLogger(__file__)
 def tcpping(host, port, timeout=4):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(timeout)
-    s_start = timer()
     try:
+        s_start = timer()
         s.connect((host, int(port)))
         s.shutdown(socket.SHUT_RD)
     # Connection Timed Out
