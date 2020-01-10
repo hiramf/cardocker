@@ -22,8 +22,12 @@ ENV RELEASE ${RELEASE:-v0.7.0}
 
 WORKDIR /app/src
 
-RUN git clone --recurse-submodules https://github.com/input-output-hk/jormungandr . \
-    && git checkout tags/${RELEASE} \
+RUN git clone --recurse-submodules https://github.com/input-output-hk/jormungandr .
+
+RUN if [ "${RELEASE}" != "master" ]; \
+    then \
+    git checkout tags/${RELEASE}; fi \
+    && echo "[INFO] - Building ${RELEASE}" \
     && git submodule update --recursive \
     && cargo install --path jormungandr --features systemd \
     && cargo install --path jcli \
@@ -37,10 +41,10 @@ ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
-ARG PREFIX
-ENV ENV_PREFIX=${PREFIX:-/app}
-ENV PATH=${ENV_PREFIX}/bin:${PATH}
+ENV PUBLIC_PORT=3000
 
+ENV ENV_PREFIX=/app
+ENV PATH=${ENV_PREFIX}/bin:${PATH}
 WORKDIR ${ENV_PREFIX}/bin
 
 COPY --from=build /usr/local/cargo/bin/jormungandr .
@@ -66,7 +70,7 @@ RUN chmod +x init.sh \
     && pip3 install -r requirements.txt
 
 
-EXPOSE 8299
+EXPOSE ${PUBLIC_PORT}
 
 ENTRYPOINT ["/tini", "-g", "--", "init.sh"]
 CMD jormungandr --genesis-block-hash $HASH --config ${STORAGE_DIR}/config.yaml
