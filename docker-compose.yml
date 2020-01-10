@@ -2,20 +2,20 @@ version: '3'
 
 services:
   node:
+    image: cardocker_node:nightly
     build: 
       context: ./node
       args:
-        - RELEASE=v0.8.5-alpha1
+        - RELEASE=master
     environment:
-        - CONFIG=https://hydra.iohk.io/build/1523436/download/1/nightly-config.yaml
-        - HASH=9409af111b04896c756c1cee3b7f9bae8b9ed1843c9e0a5f07d92ab9b62f6f78
-        - ACCOUNT_ADDRESS=${ACCOUNT_ADDRESS}
-        - REST_PORT=${REST_PORT}
-        - LISTEN_PORT=${LISTEN_PORT}
-        - STORAGE_DIR=${STORAGE_DIR}
+        - CONFIG=https://hydra.iohk.io/build/1545777/download/1/itn_rewards_v1-config.yaml
+        - HASH=8e4d2a343f3dcf9330ad9035b3e8d168e6728904262f2c434a4f8f934ec7b676
+        - ACCOUNT_ADDRESS
+        - STORAGE_DIR
+        - REST_PORT
+        - PUBLIC_PORT
     ports:
-      - 8299:8299
-      - 3000:3000
-      - 8488:8488
+      - "3000:3000"
+      - "3100:3100"
     volumes:
-      - ${LOCAL_STORAGE}:${STORAGE_DIR}
+      - ./storage/chain:/mnt/storage
