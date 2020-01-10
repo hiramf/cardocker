@@ -42,8 +42,8 @@ def tcpping(host, port, timeout=4):
 
 ENV_PREFIX = os.environ.get('ENV_PREFIX')
 CONFIG_URL = os.environ.get('CONFIG')
-LISTEN_PORT = os.environ.get('LISTEN_PORT', default=3000)
-REST_PORT = os.environ.get('REST_PORT', default=3100)
+PUBLIC_PORT = os.environ.get('PUBLIC_PORT', default=8299)
+REST_PORT = os.environ.get('REST_PORT', default=8443)
 STORAGE_DIR = os.environ.get('STORAGE_DIR', default="/mnt/storage")
 PUBLIC_ID = os.environ.get('PUBLIC_ID', default=secrets.token_hex(24))
 
@@ -60,8 +60,8 @@ with request.urlopen('https://api.ipify.org') as response:
     PUBLIC_IP = response.read().decode('utf-8')
 
 # Required
-config['p2p']['listen_address'] = f"/ip4/0.0.0.0/tcp/{LISTEN_PORT}"
-config['p2p']['public_address'] = f"/ip4/{PUBLIC_IP}/tcp/{LISTEN_PORT}"
+config['p2p']['public_address'] = f"/ip4/{PUBLIC_IP}/tcp/{PUBLIC_PORT}"
+config['p2p']['listen_address'] = f"/ip4/0.0.0.0/tcp/{PUBLIC_PORT}"
 config['storage'] = STORAGE_DIR
 config['rest']['listen'] = f"127.0.0.1:{REST_PORT}"
 
@@ -102,3 +102,26 @@ logger.info(f"Using {len(config['p2p']['trusted_peers'])}/{n_peers} trusted peer
 with open(f"{STORAGE_DIR}/config.yaml", 'w') as file:
     documents = yaml.dump(config, file)
 
+
+"""
+I'm now blocking anyone with multiple connections from the same IP
+you get the nodes list of established connections
+then just look for duplicates
+
+echo "Proto Recv-Q Send-Q Local Address           Foreign Address         State"
+    nodes="$(netstat -tupan | grep jor | grep EST | cut -c 1-80)"
+    total="$(netstat -tupan | grep jor | grep EST | cut -c 1-80 | wc -l)"
+    printf "%s\n" "${nodes}" "----------" "Total:" "${total}"
+
+sudo ufw deny from <any duplicate IP's in established connections>
+
+or cron
+#!/bin/bash
+netstat -tupan | grep jor | grep EST | awk '{print $5}' | uniq > tmp
+IPS=$(sort tmp | uniq -d | cut -d ':' -f1)
+
+for IP in $IPS; do
+  ufw deny from $IP to any
+done
+
+"""
